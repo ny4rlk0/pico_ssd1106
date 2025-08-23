@@ -8,7 +8,6 @@ int x = 128; // Start off-screen right
 int contrast = 0;
 const int buttonPins[] = {2, 3, 6, 7, 8};
 bool buttonStates[5];
-bool ledState = false;
 
 // 'oledlogo', 128x64px
 const unsigned char epd_bitmap_oledlogo [] PROGMEM = {
