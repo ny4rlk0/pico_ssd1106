@@ -1,12 +1,16 @@
+//Press A or GP2 to Soft reboot!
 //OLED SSD1106 Support
 #include <U8g2lib.h>
+// Reboot Support
+#include "hardware/watchdog.h"
 
 U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 
 //
 int x = 128; // Start off-screen right
 int contrast = 0;
-const int buttonPins[] = {2, 3, 6, 7, 8};
+const char* gpoPins[] = {"GP2","GP3","GP6","GP7","GP8"};
+const int buttonPins[] = {2,    3,    6,    7,    8};
 bool buttonStates[5];
 
 // 'oledlogo', 128x64px
@@ -80,6 +84,7 @@ const unsigned char epd_bitmap_oledlogo [] PROGMEM = {
 
 void setup() {
   // put your setup code here, to run once:
+  pinMode(buttonPins[0], INPUT_PULLUP);  // Button connected to GND
   // Initalize OLED SCREEN
   u8g2.begin();
   // Set Brightness to Max 0-255
@@ -88,7 +93,7 @@ void setup() {
   for(int i=0;i<5;i++){
     pinMode(buttonPins[i],INPUT_PULLUP);
   }
-  //Show boot logo for 6.6 seconds while modifying brightness.
+  //Show boot logo for 3 seconds
   u8g2.clearBuffer();
 	u8g2.drawXBMP(0, 0, 128, 64, epd_bitmap_oledlogo);
   u8g2.sendBuffer();
@@ -97,7 +102,7 @@ void setup() {
   int contrast = 0;
   int direction = 5; // Step size
 
-  while (millis() - startTime < 6600) {
+  while (millis() - startTime < 6350) {
     u8g2.setContrast(contrast);
     contrast += direction;
 
@@ -109,7 +114,9 @@ void setup() {
     }
     // Set Brightness to Max 0-255
     u8g2.setContrast(255);
-    delay(1000); // Hold at full contrast for a moment 1 second
+    delay(2000); // Hold at full contrast for a moment
+
+    //delay(3000);
   }
 
 void loop() {
@@ -137,5 +144,9 @@ void loop() {
 
   // Delay between reads
   delay(100);
-
+  if (digitalRead(buttonPins[0]) == LOW) {
+    delay(50); // Optional debounce
+    watchdog_reboot(0,0,0);
+    //NVIC_SystemReset();  // Soft reset the Pico W
+  }
 }
