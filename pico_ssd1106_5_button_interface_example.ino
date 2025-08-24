@@ -1,4 +1,3 @@
-//Press A or GP2 to Soft reboot!
 //OLED SSD1106 Support
 #include <U8g2lib.h>
 // Reboot Support
@@ -137,7 +136,13 @@ void loop() {
     u8g2.print("GP");
     u8g2.print(buttonPins[i]);
     u8g2.print(": ");
-    u8g2.print(buttonStates[i] ? "ON" : "OFF");
+    if(i==0){
+      u8g2.print("Soft Reboot!");
+    }
+    else{
+      u8g2.print(buttonStates[i] ? "ON" : "OFF");
+    }
+
   }
   // Update screen
   u8g2.sendBuffer();
@@ -147,6 +152,5 @@ void loop() {
   if (digitalRead(buttonPins[0]) == LOW) {
     delay(50); // Optional debounce
     watchdog_reboot(0,0,0);
-    //NVIC_SystemReset();  // Soft reset the Pico W
   }
 }
